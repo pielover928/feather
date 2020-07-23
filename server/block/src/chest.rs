@@ -358,14 +358,21 @@ impl InteractionHandler for ChestInteraction {
         // For large chests, the top row is the left
         // chest (ChestKind::Right, oddly enough) and the
         // bottom row is the right chest (ChestKind::Left).
+        
+        
 
-        let chests: ArrayVec<[Option<Entity>; 2]> = opened_chests(game, pos);
-        let slots = slots(world, &chests);
+        match game.block_at(pos + BlockPosition::new(0,1,0)){
+            Some(block) if block.kind().full_block() => (),
+            _ =>  {
+                let chests: ArrayVec<[Option<Entity>; 2]> = opened_chests(game, pos);
+                let slots = slots(world, &chests);
 
-        send_open_window(world, player, slots.len(), window_id);
-        send_window_items(world, player, slots, window_id);
+                send_open_window(world, player, slots.len(), window_id);
+                send_window_items(world, player, slots, window_id);
 
-        set_player_window(game, world, player, &chests);
+                set_player_window(game, world, player, &chests);
+            }
+        }
     }
 
     fn block_kind(&self) -> BlockKind {

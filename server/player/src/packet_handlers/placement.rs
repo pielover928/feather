@@ -39,6 +39,7 @@ static INTERACTION_HANDLERS: Lazy<HashMap<BlockKind, &'static dyn InteractionHan
         handlers_hashmap
     });
 
+
 /// System for handling Player Block Placement packets
 /// and updating the world accordingly.
 ///
@@ -99,6 +100,8 @@ pub fn handle_block_placement(
 ) {
     let gamemode = *world.get::<Gamemode>(player);
 
+    
+
     let item = {
         let inventory = world.get::<Inventory>(player);
         match inventory.item_in_main_hand(player, world) {
@@ -121,20 +124,24 @@ pub fn handle_block_placement(
             packet.location + packet.face.placement_offset()
         };
 
-        let current_block = game.block_at(pos).unwrap();
+        match game.block_at(pos) {
+            Some(current_block) => {
+                if !current_block.is_replaceable() {
+                    return;
+                }
 
-        if !current_block.is_replaceable() {
-            return;
+                // Deny replacing grass with grass for example
+                if current_block.is_replaceable()
+                    && !current_block.is_air()
+                    && !current_block.is_fluid()
+                    && block.is_replaceable()
+                {
+                    return;
+                }
+            },
+            None => ()
         }
 
-        // Deny replacing grass with grass for example
-        if current_block.is_replaceable()
-            && !current_block.is_air()
-            && !current_block.is_fluid()
-            && block.is_replaceable()
-        {
-            return;
-        }
 
         let block = update_block_state_for_placement(
             game,
@@ -548,3 +555,8 @@ fn facing_directions(d: Vec3d) -> [FacingCubic; 6] {
         dirs[0].opposite(),
     ]
 }
+
+
+
+
+

@@ -2,7 +2,9 @@ use num_traits::FromPrimitive;
 use std::convert::TryFrom;
 use thiserror::Error;
 
+
 pub use feather_definitions::BlockKind;
+
 
 mod categories;
 mod directions;
@@ -10,6 +12,7 @@ mod directions;
 #[allow(clippy::all)]
 mod generated;
 mod wall_blocks;
+
 
 static BLOCK_TABLE: Lazy<BlockTable> = Lazy::new(|| {
     let bytes = include_bytes!("generated/table.dat");
@@ -89,6 +92,7 @@ impl From<BlockId> for u32 {
         ((id.kind as u32) << 16) | id.state as u32
     }
 }
+
 
 #[derive(Debug, Error)]
 pub enum BlockIdFromU32Error {
